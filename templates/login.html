@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1120">
+  <title>Sign in · NetPulse</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <a class="brand auth-brand" href="/"><span class="brand-mark">N</span><span>NetPulse</span></a>
+    <p class="eyebrow">YOUR PRIVATE NETWORK, IN FOCUS</p>
+    <h1 id="auth-title">Welcome back</h1>
+    <p class="muted" id="auth-subtitle">Sign in to your NetPulse device.</p>
+    <form id="auth-form">
+      <label for="username">Username</label>
+      <input id="username" name="username" autocomplete="username" minlength="3" maxlength="32" required>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" minlength="10" required>
+      <button class="button primary full" id="auth-submit" type="submit">Sign in</button>
+    </form>
+    <p class="auth-switch muted"><span id="auth-switch-text">New to this device?</span> <button class="text-button" id="auth-switch" type="button">Create an account</button></p>
+    <div class="notice error hidden" id="auth-error" role="alert"></div>
+    <p class="auth-note">Accounts are stored only on this NetPulse device. Registration is open to the first authorized user on this instance.</p>
+  </main>
+  <script src="/static/js/login.js"></script>
+</body>
+</html>

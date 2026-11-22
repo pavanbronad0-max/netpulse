@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1120">
+  <title>NetPulse · Network dashboard</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#dashboard"><span class="brand-mark">N</span><span>NetPulse</span></a>
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="side-nav" aria-label="Main navigation">
+        <button class="nav-item active" data-view="dashboard"><span>◫</span> Overview</button>
+        <button class="nav-item" data-view="peers"><span>◉</span> Network peers <b class="nav-count" id="peer-nav-count">0</b></button>
+        <button class="nav-item" data-view="files"><span>⇧</span> File sharing</button>
+        <button class="nav-item" data-view="history"><span>◷</span> Transfer history</button>
+        <button class="nav-item" data-view="analytics"><span>⌁</span> Network analytics</button>
+        <button class="nav-item" data-view="telemetry"><span>▤</span> System telemetry</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="secure-card"><span class="secure-icon">◈</span><div><strong>Private by design</strong><small>Opt-in peers · encrypted files</small></div></div>
+        <button class="nav-item" data-view="settings"><span>⚙</span> Settings &amp; security</button>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobile-menu" aria-label="Toggle navigation">☰</button>
+        <div class="breadcrumb">Workspace <span>/</span> <strong id="breadcrumb-current">Overview</strong></div>
+        <div class="top-actions">
+          <div class="connection"><i class="status-dot"></i><span id="connection-label">Connecting</span></div>
+          <div class="user-menu"><span class="avatar" id="user-avatar">N</span><span id="username-label">Local user</span><button class="icon-button" id="logout" title="Sign out">↪</button></div>
+        </div>
+      </header>
+      <div class="content">
+        <section class="view active" id="view-dashboard">
+          <div class="page-heading"><div><p class="eyebrow">SUNDAY, 22 NOVEMBER</p><h1>Network overview</h1><p class="muted">A live view of your NetPulse device and trusted LAN.</p></div><button class="button secondary" id="refresh-all">↻ <span>Refresh</span></button></div>
+          <div class="stat-grid">
+            <article class="stat-card"><div class="stat-top"><span class="stat-icon blue">◉</span><span class="stat-trend">LIVE</span></div><p>Online peers</p><strong id="stat-peers">—</strong><small id="stat-peers-note">Opt-in NetPulse devices</small></article>
+            <article class="stat-card"><div class="stat-top"><span class="stat-icon violet">⇧</span><span class="stat-trend neutral">SECURE</span></div><p>Files transferred</p><strong id="stat-files">—</strong><small>Encrypted file activity</small></article>
+            <article class="stat-card"><div class="stat-top"><span class="stat-icon cyan">◌</span><span class="stat-trend neutral">SYSTEM</span></div><p>CPU usage</p><strong><span id="stat-cpu">—</span><small class="unit">%</small></strong><div class="meter"><i id="cpu-meter"></i></div></article>
+            <article class="stat-card"><div class="stat-top"><span class="stat-icon orange">▤</span><span class="stat-trend neutral">SYSTEM</span></div><p>Memory usage</p><strong><span id="stat-memory">—</span><small class="unit">%</small></strong><div class="meter"><i id="memory-meter"></i></div></article>
+          </div>
+          <div class="dashboard-grid">
+            <article class="panel chart-panel"><div class="panel-heading"><div><h2>Network activity</h2><p class="muted">Live throughput · bytes per second</p></div><span class="live-pill"><i></i> LIVE</span></div><div class="chart-legend"><span><i class="legend-blue"></i>Download</span><span><i class="legend-cyan"></i>Upload</span></div><canvas class="chart" id="overview-chart" aria-label="Network throughput chart"></canvas></article>
+            <article class="panel activity-panel"><div class="panel-heading"><div><h2>Recent activity</h2><p class="muted">Latest device events</p></div><button class="text-button" data-go="history">View all</button></div><div class="activity-list" id="activity-list"></div></article>
+          </div>
+          <div class="bottom-grid">
+            <article class="panel"><div class="panel-heading"><div><h2>Device status</h2><p class="muted">Current network connection</p></div><span class="status-chip" id="device-status">Checking</span></div><div class="device-info"><div><span>Local IP address</span><strong id="local-ip">—</strong></div><div><span>Active interfaces</span><strong id="interfaces">—</strong></div><div><span>System uptime</span><strong id="uptime">—</strong></div></div></article>
+            <article class="panel"><div class="panel-heading"><div><h2>Peer discovery</h2><p class="muted">Participating devices only</p></div><button class="text-button" data-go="peers">Manage peers →</button></div><div class="empty-inline"><span class="empty-icon">◎</span><p id="peer-summary">Looking for opted-in NetPulse devices on this LAN.</p></div></article>
+          </div>
+        </section>
+
+        <section class="view" id="view-peers">
+          <div class="page-heading"><div><p class="eyebrow">LOCAL NETWORK</p><h1>Network peers</h1><p class="muted">Only devices running NetPulse with discovery enabled appear here.</p></div><button class="button secondary" id="refresh-peers">↻ Refresh peers</button></div>
+          <div class="toolbar"><input class="search" id="peer-search" placeholder="Search device name or IP…" aria-label="Search peers"><span class="muted" id="peer-total"></span></div>
+          <div class="peer-grid" id="peer-list"></div>
+        </section>
+
+        <section class="view" id="view-files">
+          <div class="page-heading"><div><p class="eyebrow">ENCRYPTED FILE DROP</p><h1>Share a file</h1><p class="muted">Files are encrypted on this device. Peer copies use the recipient's pinned public key.</p></div></div>
+          <div class="share-layout">
+            <article class="panel upload-panel"><div class="panel-heading"><div><h2>New transfer</h2><p class="muted">Choose a trusted online peer or keep a private local copy.</p></div><span class="secure-icon">◈</span></div>
+              <form id="upload-form"><label class="drop-zone" id="drop-zone" for="file-input"><span class="upload-icon">⇧</span><strong>Drop a file here or <em>browse</em></strong><small>Files are encrypted before storage or transfer</small><span class="file-picked hidden" id="file-picked"></span></label><input id="file-input" type="file" hidden>
+                <label for="recipient">Recipient</label><select id="recipient"><option value="">Private vault on this device</option></select>
+                <div class="file-limit"><span>Maximum file size</span><strong id="max-file-label">25 MB</strong></div>
+                <button class="button primary full" type="submit" id="upload-submit">Encrypt and upload</button><div class="progress hidden" id="upload-progress"><i></i></div>
+              </form>
+            </article>
+            <aside class="panel share-security"><span class="security-big">◈</span><h2>Protected end to end</h2><p>Peer transfers are encrypted to the recipient device's RSA key. The receiving user must accept the request before downloading or decrypting it.</p><div class="security-row"><i>✓</i><span>Encrypted at rest on both devices</span></div><div class="security-row"><i>✓</i><span>Recipient approval required</span></div><div class="security-row"><i>✓</i><span>Peer key fingerprint pinning</span></div><div class="security-row"><i>✓</i><span>Private LAN devices only</span></div></aside>
+          </div>
+        </section>
+
+        <section class="view" id="view-history">
+          <div class="page-heading"><div><p class="eyebrow">FILE ACTIVITY</p><h1>Transfer history</h1><p class="muted">Review sent, received, and locally stored files.</p></div><button class="button secondary" id="refresh-transfers">↻ Refresh</button></div>
+          <div class="toolbar"><input class="search" id="transfer-search" placeholder="Search transfers…" aria-label="Search transfers"><span class="muted" id="transfer-total"></span></div>
+          <div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>FILE</th><th>PEER</th><th>SIZE</th><th>STATUS</th><th>DATE</th><th></th></tr></thead><tbody id="transfer-list"></tbody></table></div><div class="empty-state hidden" id="transfers-empty"><span>⇧</span><h3>No transfers yet</h3><p>Your encrypted file activity will appear here.</p></div></div>
+        </section>
+
+        <section class="view" id="view-analytics">
+          <div class="page-heading"><div><p class="eyebrow">NETWORK ANALYZER</p><h1>Network analytics</h1><p class="muted">Traffic counters and throughput observed by this device only.</p></div><a class="button secondary" href="/api/telemetry/export.csv">⇩ Export CSV</a></div>
+          <div class="stat-grid three"><article class="stat-card"><div class="stat-top"><span class="stat-icon blue">↓</span><span class="stat-trend neutral">DOWNLOAD</span></div><p>Receive rate</p><strong id="network-download">—</strong><small>Network bytes per second</small></article><article class="stat-card"><div class="stat-top"><span class="stat-icon cyan">↑</span><span class="stat-trend neutral">UPLOAD</span></div><p>Send rate</p><strong id="network-upload">—</strong><small>Network bytes per second</small></article><article class="stat-card"><div class="stat-top"><span class="stat-icon violet">◉</span><span class="stat-trend neutral">INTERFACE</span></div><p>Local address</p><strong class="small-value" id="network-ip">—</strong><small id="network-interfaces">Active interface: —</small></article></div>
+          <article class="panel chart-panel analytics-chart"><div class="panel-heading"><div><h2>Throughput over time</h2><p class="muted">Live device network activity</p></div><span class="live-pill"><i></i> LIVE</span></div><div class="chart-legend"><span><i class="legend-blue"></i>Download</span><span><i class="legend-cyan"></i>Upload</span></div><canvas class="chart tall" id="analytics-chart"></canvas></article>
+          <div class="notice"><strong>Privacy note</strong><span>NetPulse uses operating-system interface counters. It does not capture packets or inspect traffic from unrelated devices.</span></div>
+        </section>
+
+        <section class="view" id="view-telemetry">
+          <div class="page-heading"><div><p class="eyebrow">DEVICE HEALTH</p><h1>System telemetry</h1><p class="muted">Live resource usage from this computer.</p></div><a class="button secondary" href="/api/telemetry/export.csv">⇩ Export CSV</a></div>
+          <div class="stat-grid three"><article class="stat-card"><div class="stat-top"><span class="stat-icon cyan">◌</span><span class="stat-trend neutral">PROCESSOR</span></div><p>CPU utilization</p><strong><span id="telemetry-cpu">—</span><small class="unit">%</small></strong><div class="meter"><i id="telemetry-cpu-meter"></i></div></article><article class="stat-card"><div class="stat-top"><span class="stat-icon orange">▤</span><span class="stat-trend neutral">MEMORY</span></div><p>RAM utilization</p><strong><span id="telemetry-memory">—</span><small class="unit">%</small></strong><div class="meter"><i id="telemetry-memory-meter"></i></div><small id="memory-capacity">—</small></article><article class="stat-card"><div class="stat-top"><span class="stat-icon violet">▥</span><span class="stat-trend neutral">STORAGE</span></div><p>Disk utilization</p><strong><span id="telemetry-disk">—</span><small class="unit">%</small></strong><div class="meter"><i id="telemetry-disk-meter"></i></div><small id="disk-capacity">—</small></article></div>
+          <div class="dashboard-grid"><article class="panel chart-panel"><div class="panel-heading"><div><h2>Resource trends</h2><p class="muted">Local telemetry history</p></div><span class="live-pill"><i></i> LIVE</span></div><div class="chart-legend"><span><i class="legend-blue"></i>CPU</span><span><i class="legend-cyan"></i>RAM</span></div><canvas class="chart" id="resource-chart"></canvas></article><article class="panel"><div class="panel-heading"><div><h2>Network totals</h2><p class="muted">Since system startup</p></div></div><div class="device-info"><div><span>Data sent</span><strong id="bytes-sent">—</strong></div><div><span>Data received</span><strong id="bytes-received">—</strong></div><div><span>System uptime</span><strong id="telemetry-uptime">—</strong></div></div></article></div>
+        </section>
+
+        <section class="view" id="view-settings">
+          <div class="page-heading"><div><p class="eyebrow">DEVICE CONFIGURATION</p><h1>Settings &amp; security</h1><p class="muted">Manage this device's dashboard and peer trust.</p></div></div>
+          <div class="settings-grid"><article class="panel settings-panel"><div class="panel-heading"><div><h2>Preferences</h2><p class="muted">Saved to your local account</p></div></div><form id="settings-form"><label for="refresh-interval">Telemetry refresh interval</label><select id="refresh-interval"><option value="2">2 seconds</option><option value="3">3 seconds</option><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="15">15 seconds</option><option value="30">30 seconds</option></select><label for="theme-select">Appearance</label><select id="theme-select"><option value="dark">Dark</option><option value="light">Light</option></select><div class="security-summary"><h3>Device security</h3><div><span>Discovery service</span><strong id="discovery-state">—</strong></div><div><span>Maximum file size</span><strong id="settings-file-size">—</strong></div><div><span>Device key fingerprint</span><code id="device-fingerprint">—</code></div></div><button class="button primary" type="submit">Save preferences</button></form></article><article class="panel settings-panel"><div class="panel-heading"><div><h2>About NetPulse</h2><p class="muted">Local-first LAN sharing and telemetry</p></div></div><div class="device-info"><div><span>Device name</span><strong id="device-name">—</strong></div><div><span>Device ID</span><strong class="small-value" id="device-id">—</strong></div><div><span>Discovery scope</span><strong>Private LAN only</strong></div></div><div class="notice warning"><strong>Trust carefully</strong><span>Verify a new peer's fingerprint with its owner before trusting it. A trusted peer can send encrypted file requests to this device.</span></div></article></div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  <div class="modal-backdrop hidden" id="peer-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal"><button class="icon-button modal-close" id="modal-close" aria-label="Close">×</button><span class="stat-icon blue">◉</span><h2 id="modal-title">Verify this device</h2><p class="muted">Compare this fingerprint with the device owner through a trusted channel before adding it.</p><code class="fingerprint-large" id="modal-fingerprint"></code><p class="muted">Trusting the peer enables it to send encrypted file requests to this device.</p><div class="modal-actions"><button class="button secondary" id="modal-cancel">Cancel</button><button class="button primary" id="modal-trust">Trust peer</button></div></div></div>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
