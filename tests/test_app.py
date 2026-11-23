@@ -109,3 +109,9 @@ def test_telemetry_and_dashboard_are_live_api_responses(client):
     assert response.status_code == 200
     assert {"cpu_percent", "memory_percent", "disk_percent", "upload_bps", "download_bps"} <= set(response.json["metrics"])
     assert client.get("/api/peers").json["peers"] == []
+
+
+def test_health_check_is_public(client):
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json == {"status": "ok"}

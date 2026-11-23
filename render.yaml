@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: netpulse
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --worker-class gthread --threads 100 --bind 0.0.0.0:10000 wsgi:app
+    healthCheckPath: /health
+    envVars:
+      - key: NETPULSE_HOST
+        value: 0.0.0.0
+      - key: NETPULSE_PORT
+        value: 10000
+      - key: NETPULSE_PUBLIC_PORT
+        value: 443
+      - key: NETPULSE_PUBLIC_SCHEME
+        value: https
+      - key: NETPULSE_COOKIE_SECURE
+        value: 1
+      - key: NETPULSE_DISCOVERY
+        value: 0
+      - key: NETPULSE_DATA_DIR
+        value: /tmp/netpulse-data
+      - key: NETPULSE_SECRET_KEY
+        generateValue: true

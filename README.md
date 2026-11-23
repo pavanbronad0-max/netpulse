@@ -58,7 +58,13 @@ python app.py
 
 Open `http://localhost:5000`. Permit inbound TCP 5000 and UDP 37020 only on the trusted LAN. Firewall commands vary by distribution and network policy.
 
-### Secret generation
+## Render deployment
+
+The `render.yaml` Blueprint configures a free Render web service with HTTPS, a generated session secret, a health check, and LAN discovery disabled. To deploy, sign in at [Render](https://render.com), open **New > Blueprint**, connect `pavanbronad0-max/netpulse`, select the `main` branch, and approve the Blueprint. Render will build and publish the service at the `onrender.com` address it assigns.
+
+The selected free plan has an ephemeral filesystem: SQLite accounts, encrypted transfers, and locally generated encryption/device keys can be permanently lost when the service restarts, sleeps, or is redeployed. Do not store important files or production data on this plan. A persistent disk requires a paid Render service. The hosted service is a centralized web deployment; UDP LAN discovery is disabled and it does not make devices on unrelated private networks discoverable to one another.
+
+## Secret generation
 
 Generate a secret rather than using the example placeholder:
 

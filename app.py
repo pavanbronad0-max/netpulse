@@ -112,6 +112,11 @@ def login_page():
     return render_template("login.html")
 
 
+@app.get("/health")
+def health():
+    return jsonify({"status": "ok"})
+
+
 @app.get("/api/auth/csrf")
 def csrf_token():
     session.setdefault("csrf_token", secrets.token_urlsafe(32))
